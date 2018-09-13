@@ -80,3 +80,6 @@ C:\Users\Viktorija\Desktop\4-smestar\VP\VP-zadaci\DrinkAndGo1\DrinkAndGo1\bin\Mi
 C:\Users\Viktorija\Desktop\4-smestar\VP\VP-zadaci\DrinkAndGo1\DrinkAndGo1\obj\Debug\DrinkAndGo1.csprojResolveAssemblyReference.cache
 C:\Users\Viktorija\Desktop\4-smestar\VP\VP-zadaci\DrinkAndGo1\DrinkAndGo1\obj\Debug\DrinkAndGo1.dll
 C:\Users\Viktorija\Desktop\4-smestar\VP\VP-zadaci\DrinkAndGo1\DrinkAndGo1\obj\Debug\DrinkAndGo1.pdb
+C:\Users\Viktorija\Desktop\4-smestar\VP\VP-zadaci\DrinkAndGo1\DrinkAndGo1\obj\Debug\DrinkAndGo1.Migrations.InitialCreate.resources
+C:\Users\Viktorija\Desktop\4-smestar\VP\VP-zadaci\DrinkAndGo1\DrinkAndGo1\obj\Debug\DrinkAndGo1.csproj.GenerateResource.Cache
+C:\Users\Viktorija\Desktop\4-smestar\VP\VP-zadaci\DrinkAndGo1\DrinkAndGo1\obj\Debug\DrinkAndGo1.Migrations.shoppingCartItemm.resources

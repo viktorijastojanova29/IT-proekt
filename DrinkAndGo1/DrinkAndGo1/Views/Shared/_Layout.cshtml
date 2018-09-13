@@ -24,6 +24,7 @@
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.Partial("_Default")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink(" ", "Index", "ShoppingCart", null, new {  @class = "glyphicon glyphicon-shopping-cart"})</li>
                 </ul>
                 @Html.Partial("_LoginPartial")
                 @using (Html.BeginForm("SearchOn", "Home", FormMethod.Get, new { @class = "form-inline navbar-form navbar-right" }))

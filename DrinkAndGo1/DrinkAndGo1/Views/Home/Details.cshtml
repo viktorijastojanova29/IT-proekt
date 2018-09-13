@@ -13,11 +13,10 @@
                 <!--Text-->
                 <p class="card-text">@Model.LongDescription.</p>
                 <p class="btn btn-group pull-right">
-                    <a>@Html.ActionLink("Show all drinks", "ShowAllDrinks", "Home", null, new { @class = "btn btn-default" })</a>
+                    <a>@Html.ActionLink("Show all drinks", "ShowAllDrinks", "Home", null, new { @class = "btn btn-primary" })</a>
+                    <a>@Html.ActionLink("Add "+Model.Name+" cart", "AddToShoppingCart", "ShoppingCart", new { id = Model.DrinkId }, new { @class = "btn btn-success" })</a>
               
-                    <a class="btn btn-success" id="cartButton" asp-controller="ShoppingCart" asp-action="AddToShoppingCart" asp-route-drinkId="@Model.DrinkId">
-                        Add @Model.Name to cart
-                    </a>
+                 
                 </p>-->
             </div>
         </div>

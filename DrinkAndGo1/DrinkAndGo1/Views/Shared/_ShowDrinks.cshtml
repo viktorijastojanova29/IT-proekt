@@ -11,11 +11,11 @@
                     </h3>
                     <p>@Model.ShortDescription</p>
                 </div>
+
+  
                 <div class="addToCart text-right">
                     <p class="button ">
-                        <a class="btn btn-success" id="cartButton">
-                            Add to cart
-                        </a>
+                        <a>@Html.ActionLink("Add to cart", "AddToShoppingCart", "ShoppingCart", new { id = Model.DrinkId }, new { @class = "btn btn-success" })</a>
                     </p>
                 </div>
               
