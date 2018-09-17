@@ -5,68 +5,62 @@ using System.Data.Entity;
 using System.Linq;
 using System.ServiceModel.Channels;
 using System.Web;
+using System.Web.Mvc;
 
 namespace DrinkAndGo1.Models
 {
     public class ShoppingCart
     {
-        private readonly DrinkAndGoContext _db = new DrinkAndGoContext();
-        public ShoppingCart() { }
-        private ShoppingCart(DrinkAndGoContext db)
-        {
-            _db = db;
-        }
-
+        DrinkAndGoContext _db = new DrinkAndGoContext();
         public string ShoppingCartId { get; set; }
+        public const string CartSessionKey = "CartId";
         public List<ShoppingCartItem> ShoppingCartItems { get; set; }
 
-        public void AddToCart(Drink drink, int amount)
+        public static ShoppingCart GetCart(HttpContextBase context)
         {
-            var shoppingCartItem =
-                   _db.ShoppingCartItems.SingleOrDefault(
-                        s => s.DrinkId == drink.DrinkId);
+            var cart = new ShoppingCart();
+            cart.ShoppingCartId = cart.GetCartId(context);
+            return cart;
+        }
 
-            var id1 = drink.DrinkId;
+        // Helper method to simplify shopping cart calls
+        public static ShoppingCart GetCart(Controller controller)
+        {
+            return GetCart(controller.HttpContext);
+        }
+
+
+
+        public void AddToCart(Drink drink)
+        {
+            var shoppingCartItem = _db.ShoppingCartItems.SingleOrDefault(
+                         s => s.Drink.DrinkId == drink.DrinkId && s.ShoppingCartId == ShoppingCartId);
+
+            // Create a new cart item if no cart item exists
             if (shoppingCartItem == null)
             {
                 shoppingCartItem = new ShoppingCartItem();
                 shoppingCartItem.Amount = 1;
                 shoppingCartItem.DrinkId = drink.DrinkId;
+                shoppingCartItem.ShoppingCartId = ShoppingCartId;
                
                 _db.ShoppingCartItems.Add(shoppingCartItem);
             }
             else
             {
-               // _db.ShoppingCartItems.Find(shoppingCartItem.ShoppingCartId).Amount++;
-               shoppingCartItem.Amount++;
+                // If the item does exist in the cart, 
+                // then add one to the quantity
+                shoppingCartItem.Amount++;
             }
-
+            // Save changes
             _db.SaveChanges();
         }
 
-
-
-        public List<ShoppingCartItem> GetShoppingCartItems()
-        {
-            return ShoppingCartItems ??
-                   (ShoppingCartItems =
-                       _db.ShoppingCartItems.Where(c => c.ShoppingCartId == ShoppingCartId)
-                           .Include(s => s.Drink)
-                           .ToList());
-        }
-
-        public decimal GetShoppingCartTotal()
-        {
-            var total = _db.ShoppingCartItems.Where(c => c.ShoppingCartId == ShoppingCartId)
-                .Select(c => c.Drink.Price * c.Amount).Sum();
-            return total;
-        }
-
-        public int RemoveFromCart(Drink drink)
+        public int RemoveFromCart(int id)
         {
             var shoppingCartItem =
                     _db.ShoppingCartItems.SingleOrDefault(
-                        s => s.Drink.DrinkId == drink.DrinkId && s.ShoppingCartId == ShoppingCartId);
+                        s => s.Drink.DrinkId == id && s.ShoppingCartId == ShoppingCartId);
 
             var localAmount = 0;
 
@@ -81,13 +75,122 @@ namespace DrinkAndGo1.Models
                 {
                     _db.ShoppingCartItems.Remove(shoppingCartItem);
                 }
-            }
 
-            _db.SaveChanges();
+                _db.SaveChanges();
+            }
 
             return localAmount;
 
         }
+
+        public void EmptyCart()
+        {
+            var cartItems = _db.ShoppingCartItems.Where(
+                cart => cart.ShoppingCartId == ShoppingCartId);
+
+            foreach (var cartItem in cartItems)
+            {
+                _db.ShoppingCartItems.Remove(cartItem);
+            }
+            // Save changes
+            _db.SaveChanges();
+        }
+
+
+        public List<ShoppingCartItem> GetShoppingCartItems()
+        {
+            return _db.ShoppingCartItems.Where(
+               cart => cart.ShoppingCartId== ShoppingCartId).ToList();
+        }
+
+        public int GetCount()
+        {
+            // Get the count of each item in the cart and sum them up
+            var items = _db.ShoppingCartItems.Where (
+                cartItems => cartItems.ShoppingCartId == ShoppingCartId);
+            int count = items.ToList().Count;
+                         
+            // Return 0 if all entries are null
+            return count;
+        }
+
+       
+        public decimal GetShoppingCartTotal()
+        {
+            decimal? total = _db.ShoppingCartItems.Where(c => c.ShoppingCartId == ShoppingCartId)
+                .Select(c => c.Drink.Price * c.Amount).DefaultIfEmpty(0).Sum();
+            return total ?? decimal.Zero;
+        }
+
+        public string GetCartId(HttpContextBase context)
+        {
+            if (context.Session[CartSessionKey] == null)
+            {
+                if (!string.IsNullOrWhiteSpace(context.User.Identity.Name))
+                {
+                    context.Session[CartSessionKey] =
+                        context.User.Identity.Name;
+                }
+                else
+                {
+                    // Generate a new random GUID using System.Guid class
+                    Guid tempCartId = Guid.NewGuid();
+                    // Send tempCartId back to client as a cookie
+                    context.Session[CartSessionKey] = tempCartId.ToString();
+                }
+            }
+            return context.Session[CartSessionKey].ToString();
+        }
+
+        // When a user has logged in, migrate their shopping cart to
+        // be associated with their username
+        public void MigrateCart(string userName)
+        {
+            var shoppingCart = _db.ShoppingCartItems.Where(
+                c => c.ShoppingCartId == ShoppingCartId);
+
+            foreach (ShoppingCartItem item in shoppingCart)
+            {
+                item.ShoppingCartId = userName;
+            }
+            _db.SaveChanges();
+        }
+
+
+
+        public int CreateOrder(Order order)
+        {
+            decimal orderTotal = 0;
+
+            var cartItems = GetShoppingCartItems();
+            // Iterate over the items in the cart, 
+            // adding the order details for each
+            foreach (var shoppingCartItem in cartItems)
+            {
+                var orderDetail = new OrderDetail()
+                {
+                    Amount = shoppingCartItem.Amount,
+                    DrinkId = shoppingCartItem.Drink.DrinkId,
+                    OrderId = order.OrderId,
+                    Price = shoppingCartItem.Drink.Price
+                };
+
+                // Set the order total of the shopping cart
+                orderTotal += (shoppingCartItem.Amount * shoppingCartItem.Drink.Price);
+                _db.OrderDetails.Add(orderDetail);
+
+            }
+            // Set the order's total to the orderTotal count
+            order.OrderTotal = orderTotal;
+
+            // Save the order
+            _db.SaveChanges();
+            // Empty the shopping cart
+            EmptyCart();
+            // Return the OrderId as the confirmation number
+            return order.OrderId;
+        }
+
 
         public void ClearCart()
         {

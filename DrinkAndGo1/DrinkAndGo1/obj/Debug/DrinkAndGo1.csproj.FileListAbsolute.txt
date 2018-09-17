@@ -83,3 +83,4 @@ C:\Users\Viktorija\Desktop\4-smestar\VP\VP-zadaci\DrinkAndGo1\DrinkAndGo1\obj\De
 C:\Users\Viktorija\Desktop\4-smestar\VP\VP-zadaci\DrinkAndGo1\DrinkAndGo1\obj\Debug\DrinkAndGo1.Migrations.InitialCreate.resources
 C:\Users\Viktorija\Desktop\4-smestar\VP\VP-zadaci\DrinkAndGo1\DrinkAndGo1\obj\Debug\DrinkAndGo1.csproj.GenerateResource.Cache
 C:\Users\Viktorija\Desktop\4-smestar\VP\VP-zadaci\DrinkAndGo1\DrinkAndGo1\obj\Debug\DrinkAndGo1.Migrations.shoppingCartItemm.resources
+C:\Users\Viktorija\Desktop\4-smestar\VP\VP-zadaci\DrinkAndGo1\DrinkAndGo1\obj\Debug\DrinkAndGo1.Migrations.Orders.resources

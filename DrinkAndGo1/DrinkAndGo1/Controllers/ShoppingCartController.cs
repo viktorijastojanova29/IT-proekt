@@ -12,51 +12,80 @@ namespace DrinkAndGo1.Controllers
     public class ShoppingCartController : Controller
     {
 
-        private readonly DrinkAndGoContext _db = new DrinkAndGoContext();
-        private readonly ShoppingCart _shoppingCart = new ShoppingCart();
-        // GET: ShoppingCart
-        public ShoppingCartController() { }
-        public ShoppingCartController(DrinkAndGoContext db, ShoppingCart shoppingCart)
-        {
-            _db = db;
-            _shoppingCart = shoppingCart;
-        }
+         DrinkAndGoContext _db = new DrinkAndGoContext();
+        
 
-        public ViewResult Index()
+        public ActionResult Index()
         {
-            var items = _shoppingCart.GetShoppingCartItems();
-            _shoppingCart.ShoppingCartItems = items;
+            var cart = ShoppingCart.GetCart(this.HttpContext);
 
             var shoppingCartViewModel = new ShoppingCartViewModel
             {
-                ShoppingCart = _shoppingCart,
-                ShoppingCartTotal = _shoppingCart.GetShoppingCartTotal()
+                ShoppingCartItems = cart.GetShoppingCartItems(),
+                ShoppingCartTotal = cart.GetShoppingCartTotal()
             };
             return View(shoppingCartViewModel);
         }
 
+        // GET: /Store/AddToCart/5
         public ActionResult AddToShoppingCart(int id)
         {
-            var selectedDrink = _db.Drinks.AsNoTracking().FirstOrDefault(p => p.DrinkId == id);
-            if (selectedDrink != null)
-            {
-                var idd = selectedDrink.DrinkId;
-                _shoppingCart.AddToCart(selectedDrink, 1);
-            }
+            // Retrieve the album from the database
+            var selectedDrink = _db.Drinks.Single(p => p.DrinkId == id);
+
+
+            // Add it to the shopping cart
+            var cart = ShoppingCart.GetCart(this.HttpContext);
+
+            cart.AddToCart(selectedDrink);
+
             return RedirectToAction("Index");
         }
 
-
-        public ActionResult RemoveFromShoppingCart(int id)
+        // AJAX: /ShoppingCart/RemoveFromCart/5
+        [HttpPost]
+        public ActionResult RemoveFromCart(int id)
         {
-            var selectedDrink = _db.Drinks.FirstOrDefault(p => p.DrinkId == id);
-            if (selectedDrink != null)
+            // Remove the item from the cart
+            var cart = ShoppingCart.GetCart(this.HttpContext);
+
+            // Get the name of the drink to display confirmation
+          /*  string drinkName = _db.ShoppingCartItems
+                .Single(p => p.DrinkId == id).Drink.Name;*/
+
+            // Remove from cart
+            int itemCount = cart.RemoveFromCart(id);
+
+            // Display the confirmation message
+            var results = new ShoppingCartRemoveViewModel
             {
-                _shoppingCart.RemoveFromCart(selectedDrink);
-            }
-            return RedirectToAction("Index");
+                CartTotal = cart.GetShoppingCartTotal(),
+                CartCount = cart.GetCount(),
+                ItemCount = itemCount,
+                DeleteId = id
+            };
+            return Json(results);
         }
 
+        /*   public ActionResult RemoveFromShoppingCart(int id)
+           {
+               var selectedDrink = _db.Drinks.FirstOrDefault(p => p.DrinkId == id);
+               if (selectedDrink != null)
+               {
+                   _shoppingCart.RemoveFromCart(selectedDrink);
+               }
+               return RedirectToAction("Index");
+           }*/
+        // GET: /ShoppingCart/CartSummary
+
+        [ChildActionOnly]
+        public ActionResult CartSummary()
+        {
+            var cart = ShoppingCart.GetCart(this.HttpContext);
+
+            ViewData["CartCount"] = cart.GetCount();
+            return PartialView("CartSummary");
+        }
 
         protected override void Dispose(bool disposing)
         {

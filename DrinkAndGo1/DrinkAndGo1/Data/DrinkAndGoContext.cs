@@ -17,7 +17,9 @@ namespace DrinkAndGo1.Data
         public DbSet<Drink> Drinks { get; set; }
         public DbSet<Category> Categorise { get; set; }
         public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
 
-       
+
     }
 }
