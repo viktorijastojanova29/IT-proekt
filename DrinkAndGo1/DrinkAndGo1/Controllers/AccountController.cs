@@ -28,6 +28,42 @@ namespace DrinkAndGo1.Controllers
             SignInManager = signInManager;
         }
 
+        public ActionResult AddUserToRole()
+        {
+            AddToRoleModel model = new AddToRoleModel();
+            model.roles = new System.Collections.Generic.List<string>();
+            model.roles.Add("Admin");
+            model.roles.Add("Editor");
+            model.roles.Add("User");
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult AddUserToRole(AddToRoleModel model)
+        {
+            var user = UserManager.FindByEmail(model.Email);
+            UserManager.AddToRole(user.Id, model.Role);
+            return RedirectToAction("Index", "Home");
+        }
+
+
+        private void MigrateShoppingCart(string UserName)
+        {
+            // Associate shopping cart items with logged-in user
+            var cart = ShoppingCart.GetCart(this.HttpContext);
+
+            cart.MigrateCart(UserName);
+            Session[ShoppingCart.CartSessionKey] = UserName;
+        }
+
+        public void EmptyCart()
+        {
+            var cart = ShoppingCart.GetCart(this.HttpContext);
+            cart.ClearCart();
+            cart = new ShoppingCart();
+        }
+
+
         public ApplicationSignInManager SignInManager
         {
             get
@@ -78,11 +114,15 @@ namespace DrinkAndGo1.Controllers
             var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
             {
+              
                 case SignInStatus.Success:
+                    MigrateShoppingCart(model.Email);
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
+                    EmptyCart();
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
+                    
                     return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
                 case SignInStatus.Failure:
                 default:
@@ -155,6 +195,7 @@ namespace DrinkAndGo1.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    MigrateShoppingCart(model.Email);
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
@@ -392,6 +433,7 @@ namespace DrinkAndGo1.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            EmptyCart();
             return RedirectToAction("Index", "Home");
         }
 

@@ -14,10 +14,10 @@
                 <p class="card-text">@Model.LongDescription.</p>
                 <p class="btn btn-group pull-right">
                     <a>@Html.ActionLink("Show all drinks", "ShowAllDrinks", "Home", null, new { @class = "btn btn-primary" })</a>
-                    <a>@Html.ActionLink("Add "+Model.Name+" cart", "AddToShoppingCart", "ShoppingCart", new { id = Model.DrinkId }, new { @class = "btn btn-success" })</a>
+                    <a>@Html.ActionLink("Add "+Model.Name+" to cart", "AddToShoppingCart", "ShoppingCart", new { id = Model.DrinkId }, new { @class = "btn btn-success" })</a>
               
                  
-                </p>-->
+                </p>
             </div>
         </div>
     </div>

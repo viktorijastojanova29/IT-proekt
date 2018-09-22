@@ -7,7 +7,10 @@
 <h2>All drinks</h2>
 
 <p>
+@if (User.IsInRole("Admin"))
+{
     @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-success" })
+}
 </p>
 <table class="table" id="drinksTable">
     <thead>
@@ -41,10 +44,16 @@
 
                 </td>
                 <td>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Editor"))
+                    {
                     @Html.ActionLink(" Edit ", "Edit", new { id = item.DrinkId }, new { @class = "btn btn-warning" })
+                    }
                     <br />
                     <br />
+                    @if (User.IsInRole("Admin"))
+                    {
                     @Html.ActionLink("Delete", "Delete", new { id = item.DrinkId }, new { @class = "btn btn-danger" })
+                    }
                 </td>
             </tr>
         }

@@ -9,37 +9,35 @@ namespace DrinkAndGo1.Controllers
 {
     public class OrderController : Controller
     {
-        private readonly OrderRepository _orderRepository;
-        private readonly ShoppingCart _shoppingCart;
+       
+        ShoppingCart _shoppingCart=new ShoppingCart();
 
 
         public OrderController() { }
-        public OrderController(OrderRepository orderRepository, ShoppingCart shoppingCart)
-        {
-            _orderRepository = orderRepository;
-            _shoppingCart = shoppingCart;
-        }
 
-      
+
+        [Authorize]
         public ActionResult Checkout()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize]
         public ActionResult Checkout(Order order)
         {
-            var items = _shoppingCart.GetShoppingCartItems();
-            _shoppingCart.ShoppingCartItems = items;
-            if (_shoppingCart.ShoppingCartItems.Count == 0)
+            var cart = ShoppingCart.GetCart(this.HttpContext);
+            var items = cart.GetShoppingCartItems();
+            cart.ShoppingCartItems = items;
+            if (cart.ShoppingCartItems == null)
             {
-                ModelState.AddModelError("", "Your card is empty, add some drinks first");
+                return RedirectToAction("CheckoutNotComplete");
             }
 
             if (ModelState.IsValid)
             {
-                _orderRepository.CreateOrder(order);
-                _shoppingCart.ClearCart();
+                cart.CreateOrder(order);
+                cart.ClearCart();
                 return RedirectToAction("CheckoutComplete");
             }
 
@@ -49,6 +47,12 @@ namespace DrinkAndGo1.Controllers
         public ActionResult CheckoutComplete()
         {
             ViewBag.CheckoutCompleteMessage = "Thanks for your order! :) ";
+            return View();
+        }
+
+        public ActionResult CheckoutNotComplete()
+        {
+            ViewBag.CheckoutCompleteMessage = "Your card is empty, add some drinks first";
             return View();
         }
     }

@@ -218,15 +218,23 @@
     <Compile Include="Migrations\201809140023311_Orders.Designer.cs">
       <DependentUpon>201809140023311_Orders.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201809172308506_addValidationInOrder.cs" />
+    <Compile Include="Migrations\201809172308506_addValidationInOrder.Designer.cs">
+      <DependentUpon>201809172308506_addValidationInOrder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201809201633583_AddValidationInDrink.cs" />
+    <Compile Include="Migrations\201809201633583_AddValidationInDrink.Designer.cs">
+      <DependentUpon>201809201633583_AddValidationInDrink.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\AddToRoleModel.cs" />
     <Compile Include="Models\Category.cs" />
     <Compile Include="Models\Drink.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderDetail.cs" />
-    <Compile Include="Models\OrderRepository.cs" />
     <Compile Include="Models\ShoppingCart.cs" />
     <Compile Include="Models\ShoppingCartItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -349,9 +357,10 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Images\carousel1.jpg" />
-    <Content Include="Images\carousel2.jpg" />
     <Content Include="Images\carousel3.jpg" />
+    <Content Include="Images\cocktails.jpg" />
+    <Content Include="Images\Couple-Beers.png" />
+    <Content Include="Images\JUICE-BAR-image.jpg" />
     <Content Include="Scripts\ai.0.22.9-build00167.js" />
     <Content Include="Scripts\ai.0.22.9-build00167.min.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -487,6 +496,10 @@
     <Content Include="Views\Home\SearchOn.cshtml" />
     <Content Include="Views\ShoppingCart\Index.cshtml" />
     <Content Include="Views\Order\Checkout.cshtml" />
+    <Content Include="Views\Shared\_Settings.cshtml" />
+    <Content Include="Views\Order\CheckoutComplete.cshtml" />
+    <Content Include="Views\Order\CheckoutNotComplete.cshtml" />
+    <Content Include="Views\Account\AddUserToRole.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -507,6 +520,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201809140023311_Orders.resx">
       <DependentUpon>201809140023311_Orders.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809172308506_addValidationInOrder.resx">
+      <DependentUpon>201809172308506_addValidationInOrder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809201633583_AddValidationInDrink.resx">
+      <DependentUpon>201809201633583_AddValidationInDrink.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

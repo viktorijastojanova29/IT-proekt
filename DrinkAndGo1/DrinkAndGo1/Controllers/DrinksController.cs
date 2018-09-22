@@ -12,6 +12,7 @@ using DrinkAndGo1.ViewModels;
 
 namespace DrinkAndGo1.Controllers
 {
+    [Authorize]
     public class DrinksController : Controller
     {
         private DrinkAndGoContext db = new DrinkAndGoContext();

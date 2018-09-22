@@ -16,6 +16,11 @@ namespace DrinkAndGo1.Models
         public const string CartSessionKey = "CartId";
         public List<ShoppingCartItem> ShoppingCartItems { get; set; }
 
+        public ShoppingCart()
+        {
+            
+        }
+
         public static ShoppingCart GetCart(HttpContextBase context)
         {
             var cart = new ShoppingCart();
@@ -59,7 +64,7 @@ namespace DrinkAndGo1.Models
         public int RemoveFromCart(int id)
         {
             var shoppingCartItem =
-                    _db.ShoppingCartItems.SingleOrDefault(
+                    _db.ShoppingCartItems.FirstOrDefault(
                         s => s.Drink.DrinkId == id && s.ShoppingCartId == ShoppingCartId);
 
             var localAmount = 0;
@@ -99,8 +104,14 @@ namespace DrinkAndGo1.Models
 
         public List<ShoppingCartItem> GetShoppingCartItems()
         {
-            return _db.ShoppingCartItems.Where(
-               cart => cart.ShoppingCartId== ShoppingCartId).ToList();
+            return ShoppingCartItems ??
+                   (ShoppingCartItems =
+                       _db.ShoppingCartItems.Where(c => c.ShoppingCartId == ShoppingCartId)
+                           .Include(s => s.Drink)
+                           .ToList());
+
+            // return _db.ShoppingCartItems.Where(
+            //    cart => cart.ShoppingCartId== ShoppingCartId).ToList();
         }
 
         public int GetCount()
@@ -158,9 +169,12 @@ namespace DrinkAndGo1.Models
 
 
 
-        public int CreateOrder(Order order)
+        public void CreateOrder(Order order)
         {
             decimal orderTotal = 0;
+            order.OrderPlaced = DateTime.Now;
+
+            _db.Orders.Add(order);
 
             var cartItems = GetShoppingCartItems();
             // Iterate over the items in the cart, 
@@ -187,8 +201,7 @@ namespace DrinkAndGo1.Models
             _db.SaveChanges();
             // Empty the shopping cart
             EmptyCart();
-            // Return the OrderId as the confirmation number
-            return order.OrderId;
+           
         }
 
 
